@@ -31,9 +31,6 @@ fun HomeScreen(
     HomeScreenContent(
         modifier = Modifier,
         quoteList = state.data,
-        onAnimationComplete = { quote ->
-            homeViewModel.updateQuote(quote.copy(shouldAnimate = false))
-        },
         isLoading = state.isLoading,
     )
 }
@@ -43,7 +40,6 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
     quoteList: List<Quote>,
-    onAnimationComplete: (Quote) -> Unit = {}
 ) {
     if (isLoading) {
         Box(
@@ -68,22 +64,19 @@ fun HomeScreenContent(
     ) {
         itemsIndexed(
             items = quoteList,
-            key = { _, q ->
-                q.c.orEmpty()
+            key = { _, quote ->
+                quote.ticker.orEmpty()
             }
         ) { index, quote ->
             QuoteItemView(
-                c = quote.c,
-                ltr = quote.ltr,
+                ticker = quote.ticker,
+                exchangeOfLatestTrade = quote.exchangeOfLatestTrade,
                 name = quote.name,
-                pcp = quote.pcp,
+                priceChangeByPercentage = quote.priceChangeByPercentage,
                 percentageChangeText = quote.percentageChangeText,
-                shouldAnimate = quote.shouldAnimate,
-                priceText = quote.priceText,
-                changeText = quote.changeText,
-                onAnimationComplete = {
-                    onAnimationComplete(quote)
-                }
+                shouldAnimatePercentageChange = quote.shouldAnimatePercentageChange,
+                latestTradePriceText = quote.latestTradePriceText,
+                priceChangeInPointsText = quote.priceChangeInPointsText,
             )
 
             if (index < quoteList.lastIndex)
@@ -103,51 +96,51 @@ fun HomeScreenPreview() {
         HomeScreenContent(
             quoteList = listOf(
                 Quote(
-                    c = "AAPL",
-                    ltp = 145.0,
-                    chg = 0.5,
-                    pcp = 1.46,
-                    shouldAnimate = true,
+                    ticker = "AAPL",
+                    latestTradePrice = 145.0,
+                    priceChangeInPoints = 0.5,
+                    priceChangeByPercentage = 1.46,
+                    shouldAnimatePercentageChange = true,
                     percentageChangeText = "+1.45%",
-                    priceText = "145.00",
-                    changeText = "0.5",
-                    ltr = "NASDAQ",
+                    latestTradePriceText = "145.00",
+                    priceChangeInPointsText = "0.5",
+                    exchangeOfLatestTrade = "NASDAQ",
                     name = "Apple Inc.",
                 ),
                 Quote(
-                    c = "GAZP",
-                    ltp = 145.0,
-                    chg = 0.5,
-                    pcp = -1.46,
-                    priceText = "145.00",
-                    changeText = "0.5",
-                    shouldAnimate = true,
+                    ticker = "GAZP",
+                    latestTradePrice = 145.0,
+                    priceChangeInPoints = 0.5,
+                    priceChangeByPercentage = -1.46,
+                    latestTradePriceText = "145.00",
+                    priceChangeInPointsText = "0.5",
+                    shouldAnimatePercentageChange = true,
                     percentageChangeText = "-1.45%",
-                    ltr = "MCX",
+                    exchangeOfLatestTrade = "MCX",
                     name = "Gazprom",
                 ),
                 Quote(
-                    c = "YNDEX",
-                    ltp = 145.0,
-                    chg = 0.5,
-                    pcp = 1.46,
-                    shouldAnimate = false,
+                    ticker = "YNDEX",
+                    latestTradePrice = 145.0,
+                    priceChangeInPoints = 0.5,
+                    priceChangeByPercentage = 1.46,
+                    shouldAnimatePercentageChange = false,
                     percentageChangeText = "+1.45%",
-                    priceText = "145.00",
-                    changeText = "0.5",
-                    ltr = "MCX",
+                    latestTradePriceText = "145.00",
+                    priceChangeInPointsText = "0.5",
+                    exchangeOfLatestTrade = "MCX",
                     name = "Yandex",
                 ),
                 Quote(
-                    c = "SBER",
-                    ltp = 145.0,
-                    chg = 0.5,
-                    pcp = -1.46,
-                    shouldAnimate = false,
+                    ticker = "SBER",
+                    latestTradePrice = 145.0,
+                    priceChangeInPoints = 0.5,
+                    priceChangeByPercentage = -1.46,
+                    shouldAnimatePercentageChange = false,
                     percentageChangeText = "-1.45%",
-                    priceText = "145.00",
-                    changeText = "0.5",
-                    ltr = "MCX",
+                    latestTradePriceText = "145.00",
+                    priceChangeInPointsText = "0.5",
+                    exchangeOfLatestTrade = "MCX",
                     name = "Sberbank",
                 ),
             )

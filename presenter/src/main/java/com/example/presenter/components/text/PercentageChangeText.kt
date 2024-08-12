@@ -30,7 +30,6 @@ fun PercentageChangeText(
     percentageChangeValue: Double? = null,
     percentageChangeText: String? = null,
     shouldAnimate: Boolean? = false,
-    onAnimationComplete: () -> Unit = {},
     defaultTextColor: Color = MaterialTheme.colorScheme.onBackground,
     defaultBackgroundColor: Color = Color.Transparent,
     positivePercentageChangeBackgroundColor: Color = MaterialTheme.colorScheme.primary,
@@ -57,13 +56,13 @@ fun PercentageChangeText(
                             coroutineScope.launch {
                                 backgroundColorAnimation.animateTo(
                                     targetValue = defaultBackgroundColor,
-                                    animationSpec = tween(durationMillis = 700)
+                                    animationSpec = tween(durationMillis = 500)
                                 )
                             }
 
                             targetTextColorAnimation.animateTo(
                                 targetValue = positivePercentageChangeBackgroundColor,
-                                animationSpec = tween(durationMillis = 700)
+                                animationSpec = tween(durationMillis = 500)
                             )
                         }
 
@@ -74,19 +73,18 @@ fun PercentageChangeText(
                             coroutineScope.launch {
                                 backgroundColorAnimation.animateTo(
                                     targetValue = defaultBackgroundColor,
-                                    animationSpec = tween(durationMillis = 700)
+                                    animationSpec = tween(durationMillis = 500)
                                 )
                             }
 
                             targetTextColorAnimation.animateTo(
                                 targetValue = negativePercentageChangeBackgroundColor,
-                                animationSpec = tween(durationMillis = 700)
+                                animationSpec = tween(durationMillis = 500)
                             )
                         }
 
                         else -> targetTextColorAnimation.snapTo(defaultTextColor)
                     }
-                    onAnimationComplete()
                 }
             }
         }
@@ -146,7 +144,7 @@ fun PercentageChangeTextPreview() {
                 PercentageChangeText(
                     percentageChangeValue = -1.45,
                     shouldAnimate = false,
-                    percentageChangeText = "-1.45%"
+                    percentageChangeText = "-1.45%",
                 )
             }
         }

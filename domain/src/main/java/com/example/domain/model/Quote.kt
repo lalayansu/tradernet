@@ -2,39 +2,45 @@ package com.example.domain.model
 
 
 data class Quote(
-    val c: String? = null,
-    val chg: Double? = null,
-    val ltp: Double? = null,
-    val ltr: String? = null,
+    val ticker: String? = null,
+    val priceChangeInPoints: Double? = null,
+    val latestTradePrice: Double? = null,
+    val exchangeOfLatestTrade: String? = null,
     val name: String? = null,
-    val pcp: Double? = null,
-    val shouldAnimate: Boolean? = null,
+    val priceChangeByPercentage: Double? = null,
+    val shouldAnimatePercentageChange: Boolean? = null,
     val percentageChangeText: String? = null,
-    val changeText: String? = null,
-    val priceText: String? = null
+    val priceChangeInPointsText: String? = null,
+    val latestTradePriceText: String? = null
 ) {
     fun mergeWith(newData: Quote) = copy(
-        c = newData.c.compareStrings(c),
-        ltr = newData.ltr.compareStrings(ltr),
+        ticker = newData.ticker.compareStrings(ticker),
+        exchangeOfLatestTrade = newData.exchangeOfLatestTrade.compareStrings(exchangeOfLatestTrade),
         name = newData.name.compareStrings(name),
-        pcp = newData.pcp.compareDoubles(pcp),
-        ltp = newData.ltp.compareDoubles(ltp),
-        chg = newData.chg.compareDoubles(chg),
-        shouldAnimate = newData.pcp != null && newData.pcp != 0.0 && newData.pcp != this.pcp,
-        percentageChangeText = percentageText(newData.pcp),
-        changeText = newData.changeText.compareStrings(changeText),
-        priceText = newData.priceText.compareStrings(priceText)
+        priceChangeByPercentage = newData.priceChangeByPercentage.compareDoubles(
+            priceChangeByPercentage
+        ),
+        latestTradePrice = newData.latestTradePrice.compareDoubles(latestTradePrice),
+        priceChangeInPoints = newData.priceChangeInPoints.compareDoubles(priceChangeInPoints),
+        shouldAnimatePercentageChange = newData.priceChangeByPercentage?.isAnimationNeeded(),
+        percentageChangeText = mergePercentageChangeText(newData.priceChangeByPercentage),
+        priceChangeInPointsText = newData.priceChangeInPointsText.compareStrings(
+            priceChangeInPointsText
+        ),
+        latestTradePriceText = newData.latestTradePriceText.compareStrings(latestTradePriceText)
     )
 
-    private fun percentageText(newPcp: Double?): String? {
-        return if (newPcp == null || newPcp == 0.0) {
+    private fun Double?.isAnimationNeeded(): Boolean =
+        this != null && this != 0.0 && this != this@Quote.priceChangeByPercentage
+
+    private fun mergePercentageChangeText(newPriceChangeByPercentage: Double?) =
+        if (newPriceChangeByPercentage == null || newPriceChangeByPercentage == 0.0) {
             this.percentageChangeText
         } else {
-            newPcp.let { percent ->
+            newPriceChangeByPercentage.let { percent ->
                 if (percent > 0) "+$percent%" else "$percent%"
             }
         }
-    }
 
     private fun String?.compareStrings(oldString: String?) =
         takeIf { string -> !string.isNullOrBlank() && string != oldString } ?: oldString

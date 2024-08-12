@@ -8,15 +8,17 @@ import javax.inject.Inject
 
 class QuoteMapper @Inject constructor() : Mapper<QuoteEntity, Quote> {
     override fun toDomain(entity: QuoteEntity) = Quote(
-        c = entity.c.orEmpty(),
-        chg = entity.chg,
-        ltp = entity.ltp,
-        ltr = entity.ltr.orEmpty(),
+        ticker = entity.ticker.orEmpty(),
+        priceChangeInPoints = entity.priceChangeInPoints,
+        latestTradePrice = entity.latestTradePrice,
+        exchangeOfLatestTrade = entity.exchangeOfLatestTrade.orEmpty(),
         name = entity.name.orEmpty(),
-        pcp = entity.pcp,
-        percentageChangeText = entity.pcp?.let { if (it > 0) "+${it}%" else "${it}%" }.orEmpty(),
-        changeText = entity.chg?.roundToMinStep(entity.min_step),
-        priceText = entity.ltp?.roundToMinStep(entity.min_step)
+        priceChangeByPercentage = entity.priceChangeByPercentage,
+        percentageChangeText = entity.priceChangeByPercentage?.let { percent ->
+            if (percent > 0) "+${percent}%" else "${percent}%"
+        }.orEmpty(),
+        priceChangeInPointsText = entity.priceChangeInPoints?.roundToMinStep(entity.min_step),
+        latestTradePriceText = entity.latestTradePrice?.roundToMinStep(entity.min_step)
     )
 
     override fun toEntity(model: Quote) = QuoteEntity()

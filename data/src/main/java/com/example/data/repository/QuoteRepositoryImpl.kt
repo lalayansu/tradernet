@@ -1,6 +1,5 @@
 package com.example.data.repository
 
-import android.util.Log
 import com.example.data.entity.QuoteEntity
 import com.example.data.mapper.quote.QuoteMapper
 import com.example.data.mapper.quote.QuoteModelToEntityMapper
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -67,40 +65,24 @@ class QuoteRepositoryImpl @Inject constructor(
         quoteScarletService.observeEvent().map { event ->
             when (event) {
                 is WebSocket.Event.OnConnectionOpened<*> -> {
-                    Log.e("WSTRDNT", "observeEvent: OnConnectionOpened")
                     subscribeQuote(quotes = quotes)
                     ConnectionState.Connected
                 }
 
-                is WebSocket.Event.OnMessageReceived -> {
-                    Log.e("WSTRDNT", "observeEvent: OnMessageReceived")
-                    ConnectionState.Connected
-                }
+                is WebSocket.Event.OnMessageReceived -> ConnectionState.Connected
 
-                else -> {
-                    Log.e("WSTRDNT", "observeEvent: Disconnected")
-                    ConnectionState.Disconnected
-                }
+                else -> ConnectionState.Disconnected
             }
         }
 
     override fun observeQuote(): Flow<ConnectionState> = flow {
         emitAll(
-            tickerUpdates
-                .onEach { quoteEntity ->
-                    Log.e("WSTRDNT", "Received ticker entity: $quoteEntity")
-                }
-                .map {
-                    ConnectionState.Success(data = quoteMapper.toDomain(it))
-                }
+            tickerUpdates.map {
+                ConnectionState.Success(data = quoteMapper.toDomain(it))
+            }
         )
     }
 
-    override fun subscribeQuote(quotes: List<String>?) {
-        Log.e(
-            "WSTRDNT",
-            "Subscribing to stock updates with request: ${createSubscriptionRequest(quotes)}"
-        )
+    override fun subscribeQuote(quotes: List<String>?) =
         quoteScarletService.sendSubscribe(createSubscriptionRequest(quotes = quotes))
-    }
 }

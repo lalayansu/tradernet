@@ -29,15 +29,14 @@ import com.example.presenter.theme.TradernetTheme
 @Composable
 fun QuoteItemView(
     modifier: Modifier = Modifier,
-    c: String? = null,
-    ltr: String? = null,
+    ticker: String? = null,
+    exchangeOfLatestTrade: String? = null,
     name: String? = null,
-    pcp: Double? = null,
+    priceChangeByPercentage: Double? = null,
     percentageChangeText: String? = null,
-    changeText: String? = null,
-    priceText: String? = null,
-    shouldAnimate: Boolean? = false,
-    onAnimationComplete: () -> Unit = {}
+    priceChangeInPointsText: String? = null,
+    latestTradePriceText: String? = null,
+    shouldAnimatePercentageChange: Boolean? = false,
 ) {
     Row(
         modifier = modifier
@@ -57,10 +56,10 @@ fun QuoteItemView(
                     .wrapContentSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                LoadableImage(c = c)
+                LoadableImage(c = ticker)
 
                 Text(
-                    text = c.orEmpty(),
+                    text = ticker.orEmpty(),
                     style = MaterialTheme.typography.headlineSmall,
                     maxLines = 1,
                     overflow = Ellipsis,
@@ -69,7 +68,7 @@ fun QuoteItemView(
             }
 
             Text(
-                text = "$ltr | $name",
+                text = "$exchangeOfLatestTrade | $name",
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 overflow = Ellipsis,
@@ -83,14 +82,13 @@ fun QuoteItemView(
             verticalArrangement = Arrangement.Center
         ) {
             PercentageChangeText(
-                percentageChangeValue = pcp,
-                shouldAnimate = shouldAnimate,
-                onAnimationComplete = onAnimationComplete,
+                percentageChangeValue = priceChangeByPercentage,
+                shouldAnimate = shouldAnimatePercentageChange,
                 percentageChangeText = percentageChangeText,
             )
 
             Text(
-                text = "$priceText ( $changeText )",
+                text = "$latestTradePriceText ( $priceChangeInPointsText )",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -113,52 +111,52 @@ fun QuoteItemViewPreview() {
     TradernetTheme {
         Column {
             QuoteItemView(
-                c = "AAPL",
-                ltr = "NASDAQ",
+                ticker = "AAPL",
+                exchangeOfLatestTrade = "NASDAQ",
                 name = "Apple Inc.",
-                pcp = 1.46,
+                priceChangeByPercentage = 1.46,
                 percentageChangeText = "+1.45%",
-                priceText = "145.00",
-                changeText = "0.5",
-                shouldAnimate = true
+                latestTradePriceText = "145.00",
+                priceChangeInPointsText = "0.5",
+                shouldAnimatePercentageChange = true
             )
 
             Divider()
 
             QuoteItemView(
-                c = "GAZP",
-                pcp = -1.46,
-                shouldAnimate = true,
+                ticker = "GAZP",
+                priceChangeByPercentage = -1.46,
+                shouldAnimatePercentageChange = true,
                 percentageChangeText = "-1.45%",
-                priceText = "145.00",
-                changeText = "0.5",
-                ltr = "MCX",
+                latestTradePriceText = "145.00",
+                priceChangeInPointsText = "0.5",
+                exchangeOfLatestTrade = "MCX",
                 name = "Gazprom",
             )
 
             Divider()
 
             QuoteItemView(
-                c = "YNDEX",
-                pcp = 1.46,
-                shouldAnimate = false,
+                ticker = "YNDEX",
+                priceChangeByPercentage = 1.46,
+                shouldAnimatePercentageChange = false,
                 percentageChangeText = "+1.45%",
-                priceText = "145.00",
-                changeText = "0.5",
-                ltr = "MCX",
+                latestTradePriceText = "145.00",
+                priceChangeInPointsText = "0.5",
+                exchangeOfLatestTrade = "MCX",
                 name = "Yandex",
             )
 
             Divider()
 
             QuoteItemView(
-                c = "SBER",
-                pcp = -1.46,
-                shouldAnimate = false,
+                ticker = "SBER",
+                priceChangeByPercentage = -1.46,
+                shouldAnimatePercentageChange = false,
                 percentageChangeText = "-1.45%",
-                priceText = "145.00",
-                changeText = "0.5",
-                ltr = "MCX",
+                latestTradePriceText = "145.00",
+                priceChangeInPointsText = "0.5",
+                exchangeOfLatestTrade = "MCX",
                 name = "Sberbank",
             )
         }

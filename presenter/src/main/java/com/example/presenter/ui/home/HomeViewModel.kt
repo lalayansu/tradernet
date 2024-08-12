@@ -8,7 +8,6 @@ import com.example.domain.base.onError
 import com.example.domain.base.onSuccess
 import com.example.domain.di.IoDispatcher
 import com.example.domain.model.ConnectionState
-import com.example.domain.model.Quote
 import com.example.domain.model.request.GetQuotesRequest
 import com.example.domain.usecase.GetQuotesListUseCase
 import com.example.domain.usecase.GetRealtimeQuotesUseCase
@@ -41,22 +40,11 @@ class HomeViewModel @Inject constructor(
         getQuotesList()
     }
 
-    fun updateQuote(updatedQuote: Quote) {
-        _uiState.update { contract ->
-            val updatedList = contract.data.toMutableList()
-            val index = updatedList.indexOfFirst { it.c == updatedQuote.c }
-            if (index != -1) {
-                updatedList[index] = updatedQuote
-            }
-            contract.copy(data = updatedList)
-        }
-    }
-
     private fun observeTickers() {
         viewModelScope.launch(dispatcherIO) {
             _tickers.collect { tickers ->
                 if (tickers.isNotEmpty()) {
-                    getRealtimeQuotes(tickers)
+                    getRealtimeQuotes(list = tickers)
                 }
             }
         }
@@ -80,11 +68,6 @@ class HomeViewModel @Inject constructor(
                 Log.e("WSTRDNT", "list error -> ${it.commonErrorCode}")
             }.onSuccess { quotesList ->
                 _tickers.value = quotesList?.tickers.orEmpty().map { it.orEmpty() }
-
-                Log.e(
-                    "WSTRDNT",
-                    "list quotes success -> ${quotesList?.tickers.orEmpty().map { it.orEmpty() }}"
-                )
             }
         }
     }
@@ -108,19 +91,17 @@ class HomeViewModel @Inject constructor(
 
                     is ConnectionState.Success -> {
                         Log.e("WSTRDNT", "observeEvent: Success")
-                        Log.e("WSTRDNT", "observeEvent: ${connectionStateResult.data}")
 
                         _uiState.update { contract ->
                             val updatedList = contract.data.toMutableList()
-                            val index = updatedList.indexOfFirst { it.c == event.data.c }
+                            val index = updatedList.indexOfFirst { it.ticker == event.data.ticker }
                             if (index != -1) {
                                 val updatedStock = updatedList[index].mergeWith(event.data)
                                 updatedList[index] = updatedStock
                             } else {
-                                updatedList.add(event.data.copy(shouldAnimate = true))
+                                updatedList.add(event.data.copy(shouldAnimatePercentageChange = true))
                             }
 
-                            Log.e("WSTRDNT", "data: $updatedList")
                             contract.copy(data = updatedList, isLoading = false)
                         }
                     }
