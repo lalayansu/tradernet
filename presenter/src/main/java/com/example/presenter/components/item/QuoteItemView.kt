@@ -56,7 +56,7 @@ fun QuoteItemView(
                     .wrapContentSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                LoadableImage(c = ticker)
+                LoadableImage(ticker = ticker)
 
                 Text(
                     text = ticker.orEmpty(),

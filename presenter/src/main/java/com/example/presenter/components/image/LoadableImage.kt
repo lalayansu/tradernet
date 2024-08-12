@@ -1,5 +1,6 @@
 package com.example.presenter.components.image
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
@@ -14,26 +15,24 @@ import coil.size.Size
 import com.example.presenter.extensions.dpToPx
 
 @Composable
-fun LoadableImage(c: String?) {
+fun LoadableImage(ticker: String?) {
     val imageSize = 24.dp.dpToPx().toInt()
 
     val imagePainter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
-            .data("https://tradernet.com/logos/get-logo-by-ticker?ticker=${c?.lowercase()}")
+            .data("https://tradernet.com/logos/get-logo-by-ticker?ticker=${ticker?.lowercase()}")
             .size(Size(imageSize, imageSize))
             .crossfade(true)
             .build()
     )
 
-    if (imagePainter.state is AsyncImagePainter.State.Success) {
+    AnimatedVisibility(visible = imagePainter.state is AsyncImagePainter.State.Success) {
         Image(
             painter = imagePainter,
-            contentDescription = c,
+            contentDescription = ticker,
             modifier = Modifier
                 .wrapContentSize(),
             contentScale = ContentScale.Fit
         )
-    } else {
-        // do nothing here to hide the image
     }
 }
