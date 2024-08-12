@@ -44,7 +44,7 @@ fun PercentageChangeText(
 
     val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
 
-    LaunchedEffect(shouldAnimate) {
+    LaunchedEffect(percentageChangeValue, shouldAnimate) {
         if (shouldAnimate == true) {
             percentageChangeValue?.let { percent ->
                 coroutineScope.launch {
@@ -56,13 +56,13 @@ fun PercentageChangeText(
                             coroutineScope.launch {
                                 backgroundColorAnimation.animateTo(
                                     targetValue = defaultBackgroundColor,
-                                    animationSpec = tween(durationMillis = 500)
+                                    animationSpec = tween(durationMillis = 1000)
                                 )
                             }
 
                             targetTextColorAnimation.animateTo(
                                 targetValue = positivePercentageChangeBackgroundColor,
-                                animationSpec = tween(durationMillis = 500)
+                                animationSpec = tween(durationMillis = 1000)
                             )
                         }
 
@@ -73,13 +73,13 @@ fun PercentageChangeText(
                             coroutineScope.launch {
                                 backgroundColorAnimation.animateTo(
                                     targetValue = defaultBackgroundColor,
-                                    animationSpec = tween(durationMillis = 500)
+                                    animationSpec = tween(durationMillis = 1000)
                                 )
                             }
 
                             targetTextColorAnimation.animateTo(
                                 targetValue = negativePercentageChangeBackgroundColor,
-                                animationSpec = tween(durationMillis = 500)
+                                animationSpec = tween(durationMillis = 1000)
                             )
                         }
 
