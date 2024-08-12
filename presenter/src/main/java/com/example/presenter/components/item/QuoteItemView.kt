@@ -48,7 +48,7 @@ fun QuoteItemView(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Column(
-            modifier = Modifier.weight(0.6f),
+            modifier = Modifier.weight(0.5f),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center
         ) {
@@ -78,7 +78,7 @@ fun QuoteItemView(
         }
 
         Column(
-            modifier = Modifier.weight(0.4f),
+            modifier = Modifier.weight(0.5f),
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.Center
         ) {

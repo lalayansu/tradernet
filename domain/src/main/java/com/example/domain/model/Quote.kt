@@ -20,17 +20,25 @@ data class Quote(
         pcp = newData.pcp.compareDoubles(pcp),
         ltp = newData.ltp.compareDoubles(ltp),
         chg = newData.chg.compareDoubles(chg),
-        shouldAnimate = newData.pcp != this.pcp,
-        percentageChangeText = newData.pcp?.let { percent ->
-            if (percent > 0) "+$percent%" else "$percent%"
-        } ?: this.percentageChangeText,
+        shouldAnimate = newData.pcp != null && newData.pcp != 0.0 && newData.pcp != this.pcp,
+        percentageChangeText = percentageText(newData.pcp),
         changeText = newData.changeText.compareStrings(changeText),
         priceText = newData.priceText.compareStrings(priceText)
     )
 
+    private fun percentageText(newPcp: Double?): String? {
+        return if (newPcp == null || newPcp == 0.0) {
+            this.percentageChangeText
+        } else {
+            newPcp.let { percent ->
+                if (percent > 0) "+$percent%" else "$percent%"
+            }
+        }
+    }
+
     private fun String?.compareStrings(oldString: String?) =
-        takeIf { string -> !string.isNullOrBlank() && string != oldString } ?: this
+        takeIf { string -> !string.isNullOrBlank() && string != oldString } ?: oldString
 
     private fun Double?.compareDoubles(oldDouble: Double?) =
-        takeIf { double -> double != null && double != 0.0 && double != oldDouble } ?: this
+        takeIf { double -> double != null && double != 0.0 && double != oldDouble } ?: oldDouble
 }
