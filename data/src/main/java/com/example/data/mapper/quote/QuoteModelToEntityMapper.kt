@@ -13,7 +13,7 @@ class QuoteModelToEntityMapper @Inject constructor() :
         priceChangeInPoints = model.chg,
         latestTradePrice = model.ltp,
         exchangeOfLatestTrade = model.ltr,
-        min_step = model.min_step,
+        minStep = model.min_step,
         name = model.name,
         priceChangeByPercentage = model.pcp,
     )

@@ -30,6 +30,7 @@ fun PercentageChangeText(
     percentageChangeValue: Double? = null,
     percentageChangeText: String? = null,
     shouldAnimate: Boolean? = false,
+    onAnimationEnd: () -> Unit = {},
     defaultTextColor: Color = MaterialTheme.colorScheme.onBackground,
     defaultBackgroundColor: Color = Color.Transparent,
     positivePercentageChangeBackgroundColor: Color = MaterialTheme.colorScheme.primary,
@@ -87,6 +88,7 @@ fun PercentageChangeText(
                     }
                 }
             }
+            onAnimationEnd.invoke()
         }
     }
 

@@ -6,7 +6,7 @@ data class QuoteEntity(
     val priceChangeInPoints: Double? = null,
     val latestTradePrice: Double? = null,
     val exchangeOfLatestTrade: String? = null,
-    val min_step: Double? = null,
+    val minStep: Double? = null,
     val name: String? = null,
     val priceChangeByPercentage: Double? = null,
 )

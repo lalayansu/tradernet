@@ -32,6 +32,7 @@ fun QuoteItemView(
     ticker: String? = null,
     exchangeOfLatestTrade: String? = null,
     name: String? = null,
+    onAnimationEnd: () -> Unit = {},
     priceChangeByPercentage: Double? = null,
     percentageChangeText: String? = null,
     priceChangeInPointsText: String? = null,
@@ -85,10 +86,11 @@ fun QuoteItemView(
                 percentageChangeValue = priceChangeByPercentage,
                 shouldAnimate = shouldAnimatePercentageChange,
                 percentageChangeText = percentageChangeText,
+                onAnimationEnd = onAnimationEnd
             )
 
             Text(
-                text = "$latestTradePriceText ( $priceChangeInPointsText )",
+                text = "$latestTradePriceText ( ${priceChangeInPointsText ?: "0.0"} )",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )

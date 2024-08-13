@@ -14,7 +14,6 @@ import com.example.domain.usecase.GetQuotesListUseCase
 import com.example.domain.usecase.GetRealtimeQuotesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -47,6 +46,17 @@ class HomeViewModel @Inject constructor(
     init {
         observeTickers()
         getQuotesList()
+    }
+
+    fun onQuoteAnimationEnd(ticker: String) {
+        _uiState.update { contract ->
+            val updatedList = contract.data.toMutableList()
+            val index = updatedList.indexOfFirst { it.ticker == ticker }
+            if (index != -1) {
+                updatedList[index] = updatedList[index].copy(shouldAnimatePercentageChange = false)
+            }
+            contract.copy(data = updatedList)
+        }
     }
 
     private fun observeTickers() {
@@ -126,18 +136,18 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun processQuote(quote: Quote) = updateMutex.withLock {
-        withContext(Dispatchers.Main) {
-            _uiState.update { contract ->
-                val updatedList = contract.data.toMutableList()
+        withContext(dispatcherIO) {
+            _uiState.update { state ->
+                val updatedList = state.data.toMutableList()
                 val index = updatedList.indexOfFirst { it.ticker == quote.ticker }
                 if (index != -1) {
-                    val updatedStock = updatedList[index].mergeWith(quote)
-                    updatedList[index] = updatedStock
+                    val updatedQueue = updatedList[index].mergeWith(quote)
+                    updatedList[index] = updatedQueue
                 } else {
                     updatedList.add(quote)
                 }
 
-                contract.copy(data = updatedList, isLoading = false)
+                state.copy(data = updatedList, isLoading = false)
             }
         }
     }

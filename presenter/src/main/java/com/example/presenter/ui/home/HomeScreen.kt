@@ -32,6 +32,11 @@ fun HomeScreen(
         modifier = Modifier,
         quoteList = state.data,
         isLoading = state.isLoading,
+        onAnimationEnd = { ticker ->
+            ticker?.let {
+                homeViewModel.onQuoteAnimationEnd(it)
+            }
+        }
     )
 }
 
@@ -40,6 +45,7 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
     quoteList: List<Quote>,
+    onAnimationEnd: (ticker: String?) -> Unit = {}
 ) {
     if (isLoading) {
         Box(
@@ -77,6 +83,9 @@ fun HomeScreenContent(
                 shouldAnimatePercentageChange = quote.shouldAnimatePercentageChange,
                 latestTradePriceText = quote.latestTradePriceText,
                 priceChangeInPointsText = quote.priceChangeInPointsText,
+                onAnimationEnd = {
+                    onAnimationEnd(quote.ticker)
+                }
             )
 
             if (index < quoteList.lastIndex)

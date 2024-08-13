@@ -17,8 +17,8 @@ class QuoteMapper @Inject constructor() : Mapper<QuoteEntity, Quote> {
         percentageChangeText = entity.priceChangeByPercentage?.let { percent ->
             if (percent > 0) "+${percent}%" else "${percent}%"
         }.orEmpty(),
-        priceChangeInPointsText = entity.priceChangeInPoints?.roundToMinStep(entity.min_step),
-        latestTradePriceText = entity.latestTradePrice?.roundToMinStep(entity.min_step)
+        priceChangeInPointsText = entity.priceChangeInPoints?.roundToMinStep(entity.minStep),
+        latestTradePriceText = entity.latestTradePrice?.roundToMinStep(entity.minStep)
     )
 
     override fun toEntity(model: Quote) = QuoteEntity()
@@ -31,12 +31,12 @@ fun Double.roundToMinStep(minStep: Double?): String? {
     } else {
         minStep.let {
             (Math.round(this / minStep) * minStep).formatWithDigits(
-                digitCount = minStep.getFractionDigits() ?: 2
+                digitCount = minStep.getFractionDigits()
             )
         }
     }
 }
 
-fun Double?.getFractionDigits() = toString().split('.')[1].toIntOrNull()
+fun Double?.getFractionDigits() = this?.toString()?.split('.')?.get(1)?.length ?: 2
 
 fun Double.formatWithDigits(digitCount: Int) = String.format(Locale.US, "%.${digitCount}f", this)
