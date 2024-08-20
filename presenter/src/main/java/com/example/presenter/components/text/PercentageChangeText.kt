@@ -20,17 +20,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.domain.model.AnimationDirection
 import com.example.presenter.theme.TradernetTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 @Composable
 fun PercentageChangeText(
     modifier: Modifier = Modifier,
-    percentageChangeValue: Double? = null,
+    percentageChangeValue: BigDecimal? = null,
     percentageChangeText: String? = null,
     shouldAnimate: Boolean? = false,
     onAnimationEnd: () -> Unit = {},
+    animationDirection: AnimationDirection? = AnimationDirection.NONE,
     defaultTextColor: Color = MaterialTheme.colorScheme.onBackground,
     defaultBackgroundColor: Color = Color.Transparent,
     positivePercentageChangeBackgroundColor: Color = MaterialTheme.colorScheme.primary,
@@ -41,7 +44,14 @@ fun PercentageChangeText(
     negativePercentageTextColor: Color = MaterialTheme.colorScheme.error,
 ) {
     val backgroundColorAnimation = remember { Animatable(defaultBackgroundColor) }
-    val targetTextColorAnimation = remember { Animatable(defaultTextColor) }
+    val targetTextColorAnimation = remember {
+        Animatable(
+            initialValue = percentageChangeValue?.let {
+                if (percentageChangeValue > BigDecimal.ZERO) positivePercentageTextColor
+                else negativePercentageTextColor
+            } ?: defaultTextColor
+        )
+    }
 
     val coroutineScope = rememberCoroutineScope { Dispatchers.Main }
 
@@ -49,8 +59,8 @@ fun PercentageChangeText(
         if (shouldAnimate == true) {
             percentageChangeValue?.let { percent ->
                 coroutineScope.launch {
-                    when {
-                        percent > 0 -> {
+                    when (animationDirection) {
+                        AnimationDirection.UP -> {
                             backgroundColorAnimation.snapTo(positivePercentageChangeBackgroundColor)
                             targetTextColorAnimation.snapTo(positivePercentageChangeTextColor)
 
@@ -62,12 +72,13 @@ fun PercentageChangeText(
                             }
 
                             targetTextColorAnimation.animateTo(
-                                targetValue = positivePercentageChangeBackgroundColor,
+                                targetValue = if (percent > BigDecimal.ZERO) positivePercentageTextColor
+                                else negativePercentageTextColor,
                                 animationSpec = tween(durationMillis = 500)
                             )
                         }
 
-                        percent < 0 -> {
+                        AnimationDirection.DOWN -> {
                             backgroundColorAnimation.snapTo(negativePercentageChangeBackgroundColor)
                             targetTextColorAnimation.snapTo(negativePercentageChangeTextColor)
 
@@ -79,12 +90,16 @@ fun PercentageChangeText(
                             }
 
                             targetTextColorAnimation.animateTo(
-                                targetValue = negativePercentageChangeBackgroundColor,
+                                targetValue = if (percent > BigDecimal.ZERO) positivePercentageTextColor
+                                else negativePercentageTextColor,
                                 animationSpec = tween(durationMillis = 500)
                             )
                         }
 
-                        else -> targetTextColorAnimation.snapTo(defaultTextColor)
+                        else -> targetTextColorAnimation.snapTo(
+                            if (percentageChangeValue > BigDecimal.ZERO) positivePercentageTextColor
+                            else negativePercentageTextColor
+                        )
                     }
                 }
             }
@@ -99,13 +114,7 @@ fun PercentageChangeText(
     ) {
         Text(
             text = percentageChangeText.orEmpty(),
-            color = if (shouldAnimate == true) {
-                targetTextColorAnimation.value
-            } else {
-                percentageChangeValue?.let { percent ->
-                    if (percent > 0) positivePercentageTextColor else negativePercentageTextColor
-                } ?: defaultTextColor
-            },
+            color = targetTextColorAnimation.value,
             style = MaterialTheme.typography.headlineSmall
         )
     }
@@ -118,7 +127,7 @@ fun PercentageChangeTextPreview() {
         Column {
             Row {
                 PercentageChangeText(
-                    percentageChangeValue = 1.45,
+                    percentageChangeValue = 1.45.toBigDecimal(),
                     shouldAnimate = true,
                     percentageChangeText = "+1.45%"
                 )
@@ -126,7 +135,7 @@ fun PercentageChangeTextPreview() {
                 Spacer(modifier = Modifier.size(16.dp))
 
                 PercentageChangeText(
-                    percentageChangeValue = -1.45,
+                    percentageChangeValue = (-1.45).toBigDecimal(),
                     shouldAnimate = true,
                     percentageChangeText = "-1.45%"
                 )
@@ -136,7 +145,7 @@ fun PercentageChangeTextPreview() {
 
             Row {
                 PercentageChangeText(
-                    percentageChangeValue = 1.45,
+                    percentageChangeValue = 1.45.toBigDecimal(),
                     shouldAnimate = false,
                     percentageChangeText = "+1.45%"
                 )
@@ -144,7 +153,7 @@ fun PercentageChangeTextPreview() {
                 Spacer(modifier = Modifier.size(16.dp))
 
                 PercentageChangeText(
-                    percentageChangeValue = -1.45,
+                    percentageChangeValue = (-1.45).toBigDecimal(),
                     shouldAnimate = false,
                     percentageChangeText = "-1.45%",
                 )

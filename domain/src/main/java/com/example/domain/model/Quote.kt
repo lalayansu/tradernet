@@ -1,50 +1,73 @@
 package com.example.domain.model
 
+import com.example.domain.model.extensions.roundToMinStep
+import java.math.BigDecimal
 
 data class Quote(
     val ticker: String? = null,
-    val priceChangeInPoints: Double? = null,
-    val latestTradePrice: Double? = null,
+    val priceChangeInPoints: BigDecimal? = null,
+    val latestTradePrice: BigDecimal? = null,
     val exchangeOfLatestTrade: String? = null,
     val name: String? = null,
-    val priceChangeByPercentage: Double? = null,
+    val minStep: BigDecimal? = null,
+    val priceChangeByPercentage: BigDecimal? = null,
     val shouldAnimatePercentageChange: Boolean? = null,
     val percentageChangeText: String? = null,
-    val priceChangeInPointsText: String? = null,
-    val latestTradePriceText: String? = null
+    val priceChangeInPointsText: String? = priceChangeInPoints?.roundToMinStep(minStep),
+    val latestTradePriceText: String? = latestTradePrice?.roundToMinStep(minStep),
+    val animationDirection: AnimationDirection = AnimationDirection.NONE
 ) {
     fun mergeWith(newData: Quote) = copy(
         ticker = newData.ticker.compareStrings(ticker),
         exchangeOfLatestTrade = newData.exchangeOfLatestTrade.compareStrings(exchangeOfLatestTrade),
         name = newData.name.compareStrings(name),
-        priceChangeByPercentage = newData.priceChangeByPercentage.compareDoubles(
+        minStep = newData.minStep.compareBigDecimals(minStep),
+        priceChangeByPercentage = newData.priceChangeByPercentage.compareBigDecimals(
             priceChangeByPercentage
         ),
-        latestTradePrice = newData.latestTradePrice.compareDoubles(latestTradePrice),
-        priceChangeInPoints = newData.priceChangeInPoints.compareDoubles(priceChangeInPoints),
+        latestTradePrice = newData.latestTradePrice.compareBigDecimals(latestTradePrice),
+        priceChangeInPoints = newData.priceChangeInPoints.compareBigDecimals(priceChangeInPoints),
         shouldAnimatePercentageChange = newData.priceChangeByPercentage?.isAnimationNeeded(),
         percentageChangeText = mergePercentageChangeText(newData.priceChangeByPercentage),
-        priceChangeInPointsText = newData.priceChangeInPointsText.compareStrings(
-            priceChangeInPointsText
-        ),
-        latestTradePriceText = newData.latestTradePriceText.compareStrings(latestTradePriceText)
+        priceChangeInPointsText = newData.priceChangeInPoints?.roundToMinStep(minStep)
+            .compareStrings(priceChangeInPoints?.roundToMinStep(minStep)),
+        latestTradePriceText = newData.latestTradePrice?.roundToMinStep(minStep)
+            .compareStrings(latestTradePrice?.roundToMinStep(minStep)),
+        animationDirection = newData.latestTradePrice.compareAndDefineAnimationDirection(
+            latestTradePrice
+        )
     )
 
-    private fun Double?.isAnimationNeeded(): Boolean =
-        this != null && this != 0.0 && this != this@Quote.priceChangeByPercentage
+    private fun BigDecimal?.compareAndDefineAnimationDirection(oldValue: BigDecimal?) =
+        if (this != null && oldValue != null) when {
+            oldValue > this -> AnimationDirection.DOWN
+            oldValue < this -> AnimationDirection.UP
+            else -> AnimationDirection.NONE
+        } else AnimationDirection.NONE
 
-    private fun mergePercentageChangeText(newPriceChangeByPercentage: Double?) =
-        if (newPriceChangeByPercentage == null || newPriceChangeByPercentage == 0.0) {
+    private fun BigDecimal?.isAnimationNeeded(): Boolean =
+        this != null && this != BigDecimal.ZERO && this != this@Quote.priceChangeByPercentage
+
+    private fun mergePercentageChangeText(newPriceChangeByPercentage: BigDecimal?) =
+        if (newPriceChangeByPercentage == null || newPriceChangeByPercentage == BigDecimal.ZERO) {
             this.percentageChangeText
         } else {
             newPriceChangeByPercentage.let { percent ->
-                if (percent > 0) "+$percent%" else "$percent%"
+                if (percent > BigDecimal.ZERO) "+$percent%" else "$percent%"
             }
         }
 
     private fun String?.compareStrings(oldString: String?) =
         takeIf { string -> !string.isNullOrBlank() && string != oldString } ?: oldString
 
-    private fun Double?.compareDoubles(oldDouble: Double?) =
-        takeIf { double -> double != null && double != 0.0 && double != oldDouble } ?: oldDouble
+    private fun BigDecimal?.compareBigDecimals(oldValue: BigDecimal?) =
+        takeIf { double ->
+            double != null && double != BigDecimal.ZERO && double != oldValue
+        } ?: oldValue
+}
+
+sealed class AnimationDirection {
+    data object UP : AnimationDirection()
+    data object DOWN : AnimationDirection()
+    data object NONE : AnimationDirection()
 }

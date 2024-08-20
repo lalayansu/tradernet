@@ -1,7 +1,6 @@
 package com.example.presenter.ui.home
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -64,7 +63,6 @@ fun HomeScreenContent(
     LazyColumn(
         modifier = modifier
             .fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp),
         userScrollEnabled = true,
         state = lazyListState,
     ) {
@@ -85,12 +83,14 @@ fun HomeScreenContent(
                 priceChangeInPointsText = quote.priceChangeInPointsText,
                 onAnimationEnd = {
                     onAnimationEnd(quote.ticker)
-                }
+                },
+                animationDirection = quote.animationDirection,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             if (index < quoteList.lastIndex)
                 Divider(
-                    modifier = Modifier.padding(start = 4.dp),
+                    modifier = Modifier.padding(start = 8.dp),
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f),
                     thickness = 1.dp
                 )
@@ -106,9 +106,9 @@ fun HomeScreenPreview() {
             quoteList = listOf(
                 Quote(
                     ticker = "AAPL",
-                    latestTradePrice = 145.0,
-                    priceChangeInPoints = 0.5,
-                    priceChangeByPercentage = 1.46,
+                    latestTradePrice = 145.0.toBigDecimal(),
+                    priceChangeInPoints = 0.5.toBigDecimal(),
+                    priceChangeByPercentage = 1.46.toBigDecimal(),
                     shouldAnimatePercentageChange = true,
                     percentageChangeText = "+1.45%",
                     latestTradePriceText = "145.00",
@@ -118,9 +118,9 @@ fun HomeScreenPreview() {
                 ),
                 Quote(
                     ticker = "GAZP",
-                    latestTradePrice = 145.0,
-                    priceChangeInPoints = 0.5,
-                    priceChangeByPercentage = -1.46,
+                    latestTradePrice = 145.0.toBigDecimal(),
+                    priceChangeInPoints = 0.5.toBigDecimal(),
+                    priceChangeByPercentage = (-1.46).toBigDecimal(),
                     latestTradePriceText = "145.00",
                     priceChangeInPointsText = "0.5",
                     shouldAnimatePercentageChange = true,
@@ -130,9 +130,9 @@ fun HomeScreenPreview() {
                 ),
                 Quote(
                     ticker = "YNDEX",
-                    latestTradePrice = 145.0,
-                    priceChangeInPoints = 0.5,
-                    priceChangeByPercentage = 1.46,
+                    latestTradePrice = 145.0.toBigDecimal(),
+                    priceChangeInPoints = 0.5.toBigDecimal(),
+                    priceChangeByPercentage = 1.46.toBigDecimal(),
                     shouldAnimatePercentageChange = false,
                     percentageChangeText = "+1.45%",
                     latestTradePriceText = "145.00",
@@ -142,9 +142,9 @@ fun HomeScreenPreview() {
                 ),
                 Quote(
                     ticker = "SBER",
-                    latestTradePrice = 145.0,
-                    priceChangeInPoints = 0.5,
-                    priceChangeByPercentage = -1.46,
+                    latestTradePrice = 145.0.toBigDecimal(),
+                    priceChangeInPoints = 0.5.toBigDecimal(),
+                    priceChangeByPercentage = (-1.46).toBigDecimal(),
                     shouldAnimatePercentageChange = false,
                     percentageChangeText = "-1.45%",
                     latestTradePriceText = "145.00",

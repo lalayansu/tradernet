@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material3.Divider
@@ -22,9 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.domain.model.AnimationDirection
 import com.example.presenter.components.image.LoadableImage
 import com.example.presenter.components.text.PercentageChangeText
 import com.example.presenter.theme.TradernetTheme
+import java.math.BigDecimal
 
 @Composable
 fun QuoteItemView(
@@ -33,29 +33,30 @@ fun QuoteItemView(
     exchangeOfLatestTrade: String? = null,
     name: String? = null,
     onAnimationEnd: () -> Unit = {},
-    priceChangeByPercentage: Double? = null,
+    priceChangeByPercentage: BigDecimal? = null,
     percentageChangeText: String? = null,
     priceChangeInPointsText: String? = null,
     latestTradePriceText: String? = null,
     shouldAnimatePercentageChange: Boolean? = false,
+    animationDirection: AnimationDirection? = AnimationDirection.NONE
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(vertical = 12.dp),
+            .background(MaterialTheme.colorScheme.background),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Column(
-            modifier = Modifier.weight(0.5f),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Center
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 12.dp),
         ) {
             Row(
                 modifier = Modifier
-                    .wrapContentSize(),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
             ) {
                 LoadableImage(ticker = ticker)
 
@@ -65,41 +66,49 @@ fun QuoteItemView(
                     maxLines = 1,
                     overflow = Ellipsis,
                     color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.weight(1f)
+                )
+
+                PercentageChangeText(
+                    animationDirection = animationDirection,
+                    percentageChangeValue = priceChangeByPercentage,
+                    shouldAnimate = shouldAnimatePercentageChange,
+                    percentageChangeText = percentageChangeText,
+                    onAnimationEnd = onAnimationEnd,
+                    modifier = Modifier.align(Alignment.CenterVertically)
                 )
             }
 
-            Text(
-                text = "$exchangeOfLatestTrade | $name",
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 1,
-                overflow = Ellipsis,
-                color = MaterialTheme.colorScheme.outline,
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = "$exchangeOfLatestTrade | $name",
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    overflow = Ellipsis,
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(modifier = Modifier.size(4.dp))
+
+                Text(
+                    text = "$latestTradePriceText ( ${priceChangeInPointsText ?: "0.0"} )",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = Ellipsis,
+                )
+            }
         }
-
-        Column(
-            modifier = Modifier.weight(0.5f),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.Center
-        ) {
-            PercentageChangeText(
-                percentageChangeValue = priceChangeByPercentage,
-                shouldAnimate = shouldAnimatePercentageChange,
-                percentageChangeText = percentageChangeText,
-                onAnimationEnd = onAnimationEnd
-            )
-
-            Text(
-                text = "$latestTradePriceText ( ${priceChangeInPointsText ?: "0.0"} )",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
 
         Icon(
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier
+                .size(16.dp),
             imageVector = Icons.Outlined.ArrowForwardIos,
             contentDescription = Icons.Outlined.ArrowForwardIos.name,
             tint = MaterialTheme.colorScheme.outline
@@ -116,7 +125,7 @@ fun QuoteItemViewPreview() {
                 ticker = "AAPL",
                 exchangeOfLatestTrade = "NASDAQ",
                 name = "Apple Inc.",
-                priceChangeByPercentage = 1.46,
+                priceChangeByPercentage = 1.46.toBigDecimal(),
                 percentageChangeText = "+1.45%",
                 latestTradePriceText = "145.00",
                 priceChangeInPointsText = "0.5",
@@ -127,7 +136,7 @@ fun QuoteItemViewPreview() {
 
             QuoteItemView(
                 ticker = "GAZP",
-                priceChangeByPercentage = -1.46,
+                priceChangeByPercentage = (-1.46).toBigDecimal(),
                 shouldAnimatePercentageChange = true,
                 percentageChangeText = "-1.45%",
                 latestTradePriceText = "145.00",
@@ -140,7 +149,7 @@ fun QuoteItemViewPreview() {
 
             QuoteItemView(
                 ticker = "YNDEX",
-                priceChangeByPercentage = 1.46,
+                priceChangeByPercentage = 1.46.toBigDecimal(),
                 shouldAnimatePercentageChange = false,
                 percentageChangeText = "+1.45%",
                 latestTradePriceText = "145.00",
@@ -153,13 +162,13 @@ fun QuoteItemViewPreview() {
 
             QuoteItemView(
                 ticker = "SBER",
-                priceChangeByPercentage = -1.46,
+                priceChangeByPercentage = (-1.46).toBigDecimal(),
                 shouldAnimatePercentageChange = false,
                 percentageChangeText = "-1.45%",
-                latestTradePriceText = "145.00",
-                priceChangeInPointsText = "0.5",
+                latestTradePriceText = "145.0014559999",
+                priceChangeInPointsText = "0.54444444",
                 exchangeOfLatestTrade = "MCX",
-                name = "Sberbank",
+                name = "Sberbank Sberbank Sberbank",
             )
         }
     }
